@@ -31,6 +31,8 @@ android {
 }
 
 dependencies {
+    implementation("com.ogaclejapan.smarttablayout:library:2.0.0@aar")
+    implementation("com.ogaclejapan.smarttablayout:utils-v4:2.0.0@aar")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.9.0")
