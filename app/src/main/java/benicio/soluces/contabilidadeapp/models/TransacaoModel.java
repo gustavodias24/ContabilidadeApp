@@ -4,14 +4,22 @@ import java.io.Serializable;
 
 public class TransacaoModel implements Serializable {
     int tipo; // 0 despesa 1 receita
-    String descricao, titulo;
+    String descricao, data;
     double valor;
 
-    public TransacaoModel(int tipo, String descricao, String titulo, double valor) {
+    public TransacaoModel(int tipo, String descricao, String data, double valor) {
         this.tipo = tipo;
         this.descricao = descricao;
-        this.titulo = titulo;
+        this.data = data;
         this.valor = valor;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
     }
 
     public TransacaoModel() {
@@ -31,14 +39,6 @@ public class TransacaoModel implements Serializable {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
-    }
-
-    public String getTitulo() {
-        return titulo;
-    }
-
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
     }
 
     public double getValor() {
