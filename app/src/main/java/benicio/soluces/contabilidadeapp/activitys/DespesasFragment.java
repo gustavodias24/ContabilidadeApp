@@ -8,6 +8,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,15 +25,17 @@ import benicio.soluces.contabilidadeapp.adapters.AdapterTransacao;
 import benicio.soluces.contabilidadeapp.databinding.ActivityMainBinding;
 import benicio.soluces.contabilidadeapp.databinding.FragmentDespesasBinding;
 import benicio.soluces.contabilidadeapp.models.TransacaoModel;
+import benicio.soluces.contabilidadeapp.utils.TransacaoStorageUtil;
 
 public class DespesasFragment extends Fragment {
 
     private TextView msg;
     private RecyclerView recyclerView;
     private FragmentDespesasBinding vb;
-    private ActivityMainBinding mainb;
-    private List<TransacaoModel> lista = new ArrayList<>();
+    private List<TransacaoModel> lista;
     private AdapterTransacao adapter;
+    private Handler handler;
+    private Runnable runnable;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,8 +53,41 @@ public class DespesasFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
         recyclerView.setHasFixedSize(true);
+
+        if ( TransacaoStorageUtil.loadTransacoes(getActivity()) == null){
+            lista = new ArrayList<>();
+        }else{
+            lista = TransacaoStorageUtil.loadTransacoes(getActivity());
+        }
+
         adapter = new AdapterTransacao(lista);
         recyclerView.setAdapter(adapter);
+
+
+
+        handler = new Handler(Looper.getMainLooper());
+
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                updateRecycler();
+                handler.postDelayed(this, 1000); // Agendar a execução novamente após 3 segundos
+            }
+        };
+
+        handler.postDelayed(runnable, 1000);
+
+        return vb.getRoot();
+    }
+
+    public  void updateRecycler(){
+        lista.clear();
+        if ( TransacaoStorageUtil.loadTransacoes(getActivity()) != null){
+            for ( TransacaoModel transacao : TransacaoStorageUtil.loadTransacoes(getActivity())){
+                if (transacao.getTipo() == 0)
+                    lista.add(transacao);
+            }
+        }
 
         if ( lista.size() == 0){
             msg.setVisibility(View.VISIBLE);
@@ -59,26 +97,7 @@ public class DespesasFragment extends Fragment {
             recyclerView.setVisibility(View.VISIBLE);
         }
 
-
-        mainb = ActivityMainBinding.inflate(getLayoutInflater());
-        mainb.viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                Toast.makeText(getActivity(), "page "+ position, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-
-        return vb.getRoot();
+        adapter.notifyDataSetChanged();
     }
 
 

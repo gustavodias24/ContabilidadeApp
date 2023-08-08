@@ -3,19 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activitys.ReceitasFragment">
+    tools:context=".activitys.EmprestimoFragment">
 
+    <!-- TODO: Update blank fragment layout -->
     <TextView
-        android:id="@+id/receitasTextView"
+        android:id="@+id/msg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:text="Sem receitas cadastradas."
-        android:textColor="#606060"
+        android:text="Sem empréstimos cadastrado."
         android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerReceitas"
+        android:id="@+id/recyclerEmprestimos"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
 </FrameLayout>

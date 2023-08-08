@@ -3,9 +3,18 @@ package benicio.soluces.contabilidadeapp.models;
 import java.io.Serializable;
 
 public class TransacaoModel implements Serializable {
-    int tipo; // 0 despesa 1 receita
+    int tipo; // 0 despesa 1 receita 2 emprestimo
     String descricao, data;
-    double valor;
+    double valor, valorJuros;
+
+
+    public double getValorJuros() {
+        return valorJuros;
+    }
+
+    public void setValorJuros(double valorJuros) {
+        this.valorJuros = valorJuros;
+    }
 
     public TransacaoModel(int tipo, String descricao, String data, double valor) {
         this.tipo = tipo;

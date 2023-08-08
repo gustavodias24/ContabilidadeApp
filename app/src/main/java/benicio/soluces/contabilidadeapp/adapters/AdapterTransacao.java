@@ -32,6 +32,13 @@ public class AdapterTransacao extends RecyclerView.Adapter<AdapterTransacao.MyVi
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         TransacaoModel transacaoModel = lista.get(position);
+
+        if ( transacaoModel.getTipo() == 2){
+            holder.valorComJuros.setVisibility(View.VISIBLE);
+            holder.valorComJuros.setText(
+                    String.format("valor com juros.: R$ %.2f", transacaoModel.getValorJuros())
+            );
+        }
         holder.descri.setText(
                 "Descri.: " + transacaoModel.getDescricao()
         );
@@ -39,7 +46,7 @@ public class AdapterTransacao extends RecyclerView.Adapter<AdapterTransacao.MyVi
                 "Data.: " + transacaoModel.getData()
         );
 
-        holder.data.setText(
+        holder.valor.setText(
                 String.format("valor.: R$ %.2f", transacaoModel.getValor())
         );
 
@@ -51,12 +58,13 @@ public class AdapterTransacao extends RecyclerView.Adapter<AdapterTransacao.MyVi
     }
 
     public class MyViewHolder extends  RecyclerView.ViewHolder {
-        TextView descri, data, valor;
+        TextView descri, data, valor, valorComJuros;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             descri = itemView.findViewById(R.id.descriTransicaoText);
             data = itemView.findViewById(R.id.dataTransicaoText);
             valor = itemView.findViewById(R.id.valorTransicaoText);
+            valorComJuros = itemView.findViewById(R.id.valorJurosTransicaoText);
         }
     }
 }

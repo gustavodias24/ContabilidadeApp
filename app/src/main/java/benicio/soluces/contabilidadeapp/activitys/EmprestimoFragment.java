@@ -3,7 +3,6 @@ package benicio.soluces.contabilidadeapp.activitys;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentResultOwner;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,13 +19,12 @@ import java.util.List;
 
 import benicio.soluces.contabilidadeapp.R;
 import benicio.soluces.contabilidadeapp.adapters.AdapterTransacao;
-import benicio.soluces.contabilidadeapp.databinding.FragmentReceitasBinding;
+import benicio.soluces.contabilidadeapp.databinding.FragmentEmprestimoBinding;
 import benicio.soluces.contabilidadeapp.models.TransacaoModel;
 import benicio.soluces.contabilidadeapp.utils.TransacaoStorageUtil;
 
 
-public class ReceitasFragment extends Fragment {
-
+public class EmprestimoFragment extends Fragment {
     private AdapterTransacao adapter;
     private List<TransacaoModel> lista;
     private RecyclerView recyclerView;
@@ -34,8 +32,7 @@ public class ReceitasFragment extends Fragment {
     private Handler handler;
     private Runnable runnable;
 
-    private FragmentReceitasBinding frb;
-
+    FragmentEmprestimoBinding evb;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,11 +42,11 @@ public class ReceitasFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        frb = FragmentReceitasBinding.inflate(getLayoutInflater());
 
-        msg = frb.receitasTextView;
+        evb = FragmentEmprestimoBinding.inflate(getLayoutInflater());
+        msg = evb.msg;
 
-        recyclerView = frb.recyclerReceitas;
+        recyclerView = evb.recyclerEmprestimos;
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
         recyclerView.setHasFixedSize(true);
@@ -59,6 +56,7 @@ public class ReceitasFragment extends Fragment {
         }else{
             lista = TransacaoStorageUtil.loadTransacoes(getActivity());
         }
+
         adapter = new AdapterTransacao(lista);
         recyclerView.setAdapter(adapter);
 
@@ -73,14 +71,15 @@ public class ReceitasFragment extends Fragment {
         };
 
         handler.postDelayed(runnable, 1000);
-        return frb.getRoot();
+
+        return evb.getRoot();
     }
 
     public  void updateRecycler(){
         lista.clear();
         if ( TransacaoStorageUtil.loadTransacoes(getActivity()) != null){
             for ( TransacaoModel transacao : TransacaoStorageUtil.loadTransacoes(getActivity())){
-                if (transacao.getTipo() == 1)
+                if (transacao.getTipo() == 2)
                     lista.add(transacao);
             }
         }

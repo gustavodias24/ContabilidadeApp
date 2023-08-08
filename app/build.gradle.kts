@@ -31,6 +31,8 @@ android {
 }
 
 dependencies {
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.ogaclejapan.smarttablayout:library:2.0.0@aar")
     implementation("com.ogaclejapan.smarttablayout:utils-v4:2.0.0@aar")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")

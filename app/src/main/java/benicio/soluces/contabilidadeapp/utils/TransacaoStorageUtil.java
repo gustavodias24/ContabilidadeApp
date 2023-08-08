@@ -27,10 +27,15 @@ public class TransacaoStorageUtil {
 
     // Método para carregar a lista de transações
     public static List<TransacaoModel> loadTransacoes(Context context) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = sharedPreferences.getString(KEY_TRANSACOES, "");
-        Type type = new TypeToken<List<TransacaoModel>>() {}.getType();
-        return gson.fromJson(json, type);
+        try {
+            SharedPreferences sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString(KEY_TRANSACOES, "");
+            Type type = new TypeToken<List<TransacaoModel>>() {
+            }.getType();
+            return gson.fromJson(json, type);
+        }catch (Exception e){
+            return new ArrayList<>();
+        }
     }
 }
