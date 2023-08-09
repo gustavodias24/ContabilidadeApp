@@ -196,6 +196,11 @@ public class MainActivity extends AppCompatActivity {
                     TransacaoStorageUtil.saveTransacoes(getApplicationContext(), lista);
                     Toast.makeText(this, "Transição adicionada!", Toast.LENGTH_SHORT).show();
 
+                    atb.descriEdtText.setText("");
+                    atb.jurozEdtText.setText("");
+                    atb.valorEdtText.setText("");
+                    atb.parcelasEdtText.setText("");
+
                     dialogCriacao.dismiss();
 
                 }else{
