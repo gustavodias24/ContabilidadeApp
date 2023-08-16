@@ -5,9 +5,11 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -37,7 +39,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
-    private Dialog dialog_carregando;
+    private Dialog dialog_carregando, dialog_escolha;
 
     private Retrofit retrofit;
     private Service service;
@@ -79,9 +81,10 @@ public class MainActivity extends AppCompatActivity {
         viewPagerTab.setViewPager(viewPager);
 
         criarDialogCadastroTransicao();
+        criarAlertDialogEscolha();
 
         vb.fabAdd.setOnClickListener( fabView -> {
-            dialogCriacao.show();
+            dialog_escolha.show();
         });
 
         handler = new Handler(Looper.getMainLooper());
@@ -115,6 +118,21 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void criarAlertDialogEscolha(){
+        AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
+        b.setMessage("Escolha uma opção.");
+        b.setNegativeButton("Ver clientes", (dialogInterface, i) -> {
+            startActivity(new Intent(getApplicationContext(), ClientesActivity.class));
+            dialog_escolha.dismiss();
+        });
+        b.setPositiveButton("Criar transição", (dialogInterface, i) -> {
+            dialogCriacao.show();
+            dialog_escolha.dismiss();
+        });
+        dialog_escolha = b.create();
+    }
+
+    @SuppressLint("DefaultLocale")
     public void criarDialogCadastroTransicao(){
         AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
         AdicionarTransicaoLayoutBinding atb = AdicionarTransicaoLayoutBinding.inflate(getLayoutInflater());
@@ -141,14 +159,13 @@ public class MainActivity extends AppCompatActivity {
             String valorString = atb.valorEdtText.getText().toString();
 
             if ( !qtdParcelas.isEmpty() && !jurozPorCento.isEmpty() && !valorString.isEmpty()){
+                Double valorComJuros =  calcularValorComJuros(Double.parseDouble(valorString), Double.parseDouble(jurozPorCento));
                 atb.resultadoCalcText.setText(
                         String.format(
-                                "Valor final com juros.: %.2f",
-                                calculateFinalAmount(Double.parseDouble(valorString),
-                                        Double.parseDouble(jurozPorCento) / 100,
-                                        Integer.parseInt(qtdParcelas))
-
-                ));
+                                "Valor final com juros.: R$ %.2f\nDividido de %s parcelas de R$ %.2f",
+                                valorComJuros, qtdParcelas, valorComJuros/Double.parseDouble(qtdParcelas)
+                        )
+                );
 
             }else{
                 Toast.makeText(this, "Preencha todos os campos!", Toast.LENGTH_SHORT).show();
@@ -186,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
 
                         if ( !qtdParcelas.isEmpty() && !jurozPorCento.isEmpty()){
                             transacaoModel.setValorJuros(
-                                    calculateFinalAmount(valor, Double.parseDouble(jurozPorCento) / 100, Integer.parseInt(qtdParcelas))
+                                    calcularValorComJuros(valor, Double.parseDouble(jurozPorCento))
                             );
                         }else{
                             Toast.makeText(this, "Preencha todos os campos!", Toast.LENGTH_SHORT).show();
@@ -215,10 +232,9 @@ public class MainActivity extends AppCompatActivity {
         dialogCriacao = b.create();
     }
 
-    public  double calculateFinalAmount(double initialAmount, double interestRate, int numPayments) {
-        // Fórmula do cálculo do montante final com juros compostos
-        double finalAmount = initialAmount * Math.pow(1 + interestRate, numPayments);
-        return finalAmount;
+    public  double calcularValorComJuros(double valor, double juros) {
+        double valorDoJuros = valor + ((valor * juros)/100);
+        return valorDoJuros;
     }
 
     public void calcularResultado(List<TransacaoModel> listaResultado){
