@@ -29,7 +29,9 @@ import benicio.soluces.contabilidadeapp.R;
 import benicio.soluces.contabilidadeapp.databinding.ActivityMainBinding;
 import benicio.soluces.contabilidadeapp.databinding.AdicionarTransicaoLayoutBinding;
 import benicio.soluces.contabilidadeapp.databinding.CarregandoLayoutBinding;
+import benicio.soluces.contabilidadeapp.models.ClienteModel;
 import benicio.soluces.contabilidadeapp.models.TransacaoModel;
+import benicio.soluces.contabilidadeapp.utils.ClienteStorageUtil;
 import benicio.soluces.contabilidadeapp.utils.Service;
 import benicio.soluces.contabilidadeapp.utils.TransacaoStorageUtil;
 import retrofit2.Call;
@@ -303,6 +305,25 @@ public class MainActivity extends AppCompatActivity {
                 dialog_carregando.dismiss();
             }
         });
+        dialog_carregando.show();
+        service.puxarClientes().enqueue(new Callback<List<ClienteModel>>() {
+            @Override
+            public void onResponse(Call<List<ClienteModel>> call, Response<List<ClienteModel>> response) {
+                if (response.isSuccessful()){
+                    ClienteStorageUtil.saveUsuario(getApplicationContext(), response.body());
+                    Toast.makeText(MainActivity.this, "clientes recuperados!", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(MainActivity.this, "Erro de conexão!", Toast.LENGTH_SHORT).show();
+                }
+                dialog_carregando.dismiss();
+            }
+
+            @Override
+            public void onFailure(Call<List<ClienteModel>> call, Throwable t) {
+
+            }
+        });
+
     }
 
     public void enviarDados(){
@@ -313,7 +334,6 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccessful()){
                     Toast.makeText(MainActivity.this, response.body(), Toast.LENGTH_SHORT).show();
                 }else{
-                    Log.d("bucetinha", "onResponse: " + response.message());
                     Toast.makeText(MainActivity.this, "Erro de conexão!", Toast.LENGTH_SHORT).show();
                 }
                 dialog_carregando.dismiss();
@@ -324,6 +344,27 @@ public class MainActivity extends AppCompatActivity {
                 dialog_carregando.dismiss();
             }
         });
+
+        if ( ClienteStorageUtil.loadClientes(getApplicationContext()) != null){
+            dialog_carregando.show();
+            service.enviarClientes(ClienteStorageUtil.loadClientes(getApplicationContext())).enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
+                    if (response.isSuccessful()){
+                    }else{
+                        Toast.makeText(MainActivity.this, "Erro de conexão!", Toast.LENGTH_SHORT).show();
+                    }
+                    dialog_carregando.dismiss();
+                }
+
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
+
+                }
+            });
+        }
+
+
     }
 
     public void criarDialogCarregando(){

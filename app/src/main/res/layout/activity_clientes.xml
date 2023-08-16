@@ -23,7 +23,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <EditText
-                android:id="@+id/editTextText"
+                android:id="@+id/nome_pesquisa_edt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -32,7 +32,7 @@
                 android:padding="16dp" />
 
             <Button
-                android:id="@+id/button2"
+                android:id="@+id/pesquisar_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

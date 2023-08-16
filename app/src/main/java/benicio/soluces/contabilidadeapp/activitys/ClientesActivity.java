@@ -63,6 +63,28 @@ public class ClientesActivity extends AppCompatActivity {
             dialog_adicionar.show();
         });
 
+        binding.pesquisarBtn.setOnClickListener( pesquisar -> {
+            String query = binding.nomePesquisaEdt.getText().toString();
+            limitarLista(query);
+        });
+
+    }
+
+    public void limitarLista(String query) {
+        if (query.isEmpty()) {
+            configurarAvisoDeVazio();
+        } else {
+            List<ClienteModel> itemsToRemove = new ArrayList<>();
+
+            for (ClienteModel item : lista) {
+                if (!item.getNome().equals(query)) {
+                    itemsToRemove.add(item);
+                }
+            }
+
+            lista.removeAll(itemsToRemove);
+            adapter.notifyDataSetChanged();
+        }
     }
 
     public void criarDialogAdicionar(){
