@@ -15,6 +15,7 @@
         android:theme="@style/Theme.ContabilidadeApp"
         tools:targetApi="31">
         <activity
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
             android:name=".activitys.ClientesActivity"
             android:exported="false" />

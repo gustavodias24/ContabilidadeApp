@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:background="#4B6750A3"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/descri_pgt_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Descrição"
+        android:textColor="#0B0B0B"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/valor_pgt_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="valor"
+        android:textColor="#0B0B0B"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/data_pgt_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="data"
+        android:textColor="#0B0B0B"
+        android:textStyle="bold" />
+</LinearLayout>

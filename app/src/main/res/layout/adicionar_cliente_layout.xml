@@ -37,12 +37,18 @@
             android:hint="Quantidade de parcelas"
             android:inputType="number" />
 
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Coloque 0 se ainda não tiver." />
+
         <Button
             android:id="@+id/confirmar_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:backgroundTint="#000000"
+            android:backgroundTint="#6750A3"
             android:text="ADICIONAR"
             android:textColor="#FFFFFF"
             android:textStyle="bold" />
