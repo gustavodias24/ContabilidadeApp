@@ -182,14 +182,18 @@ public class MainActivity extends AppCompatActivity {
             if ( !valorString.isEmpty() ){
                 double valor = Double.parseDouble(valorString);
 
-                if ( atb.radioDespesa.isChecked() )
+                if ( atb.radioDespesa.isChecked() ){
                     tipo = 0;
+                }
 
-                if ( atb.radioReceita.isChecked() )
+                if ( atb.radioReceita.isChecked() ){
                     tipo = 1;
+                }
 
-                if ( atb.radioEmprestimo.isChecked() )
+                if ( atb.radioEmprestimo.isChecked() ){
                     tipo = 2;
+
+                }
 
                 if ( !descricao.isEmpty() ){
                     TransacaoModel transacaoModel = new TransacaoModel(

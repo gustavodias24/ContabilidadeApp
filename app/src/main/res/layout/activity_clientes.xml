@@ -29,7 +29,8 @@
                 android:ems="10"
                 android:hint="Pesquise pelo nome"
                 android:inputType="text"
-                android:padding="16dp" />
+                android:padding="16dp"
+                android:visibility="gone" />
 
             <Button
                 android:id="@+id/pesquisar_btn"
@@ -40,7 +41,8 @@
                 android:drawableRight="@drawable/baseline_query_stats_24"
                 android:text="BUSCAR"
                 android:textColor="#FFFFFF"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="gone" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerClientes"
