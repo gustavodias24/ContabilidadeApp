@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,10 +12,15 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import benicio.soluces.contabilidadeapp.R;
 import benicio.soluces.contabilidadeapp.models.ClienteModel;
+import benicio.soluces.contabilidadeapp.models.PagamentoModel;
+import benicio.soluces.contabilidadeapp.models.TransacaoModel;
 import benicio.soluces.contabilidadeapp.utils.ClienteStorageUtil;
 
 public class AdapterCliente extends RecyclerView.Adapter<AdapterCliente.MyViewHolder>{
@@ -38,6 +44,7 @@ public class AdapterCliente extends RecyclerView.Adapter<AdapterCliente.MyViewHo
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         ClienteModel clienteModel = lista.get(position);
+
         holder.nomeCliente.setText(clienteModel.getNome());
 
         holder.parcelas.setText("Parcelas: " + clienteModel.getQtdParcelasFaltante());
@@ -58,6 +65,17 @@ public class AdapterCliente extends RecyclerView.Adapter<AdapterCliente.MyViewHo
             holder.recycleParcelas.setAdapter(adapter);
             ClienteStorageUtil.saveUsuario(context, lista);
             adapter.notifyDataSetChanged();
+
+            Calendar calendar = Calendar.getInstance();
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
+            String formattedDate = dateFormat.format(calendar.getTime());
+            for (PagamentoModel pagamento : clienteModel.getListaPagamentos()){
+                if ( pagamento.getData().equals(formattedDate) ){
+                    holder.pagoCheck.setChecked(true);
+                }
+            }
         }
     }
 
@@ -67,6 +85,7 @@ public class AdapterCliente extends RecyclerView.Adapter<AdapterCliente.MyViewHo
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
+        CheckBox pagoCheck;
         TextView nomeCliente, parcelas, pagas,falta;
         RecyclerView recycleParcelas;
         public MyViewHolder(@NonNull View itemView) {
@@ -76,6 +95,7 @@ public class AdapterCliente extends RecyclerView.Adapter<AdapterCliente.MyViewHo
             pagas = itemView.findViewById(R.id.parcelas_pagas_text);
             falta = itemView.findViewById(R.id.parcelas_falta_text);
             recycleParcelas = itemView.findViewById(R.id.recyclerParcelas);
+            pagoCheck = itemView.findViewById(R.id.pago_check);
         }
     }
 }

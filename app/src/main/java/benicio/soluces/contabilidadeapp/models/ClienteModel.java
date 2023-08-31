@@ -5,6 +5,9 @@ import java.util.List;
 
 public class ClienteModel implements Serializable {
     List<PagamentoModel> listaPagamentos;
+
+
+
     String nome;
     int qtdParcelasFaltante;
 

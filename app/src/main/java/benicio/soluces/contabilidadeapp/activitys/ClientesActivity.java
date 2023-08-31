@@ -186,6 +186,9 @@ public class ClientesActivity extends AppCompatActivity {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         String currentDate = sdf.format(calendar.getTime());
 
+        pagamentoLayoutBinding.descriEdt.setText("Valor diário");
+        pagamentoLayoutBinding.dataEdt.setText(currentDate);
+
         pagamentoLayoutBinding.enviarBtn.setOnClickListener( enviarView -> {
             String descri = pagamentoLayoutBinding.descriEdt.getText().toString();
             Double valor = Double.parseDouble(pagamentoLayoutBinding.valorEdt.getText().toString());
