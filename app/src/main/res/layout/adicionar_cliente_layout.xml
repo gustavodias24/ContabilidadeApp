@@ -29,6 +29,26 @@
             android:inputType="text" />
 
         <EditText
+            android:id="@+id/dinheiro_emprestado_edt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:ems="10"
+            android:hint="Dinheiro emprestado $"
+            android:inputType="number|numberDecimal|numberSigned"
+            android:numeric="decimal" />
+
+        <EditText
+            android:id="@+id/juros_edt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:ems="10"
+            android:hint="Juros em %"
+            android:inputType="number"
+            android:numeric="signed|decimal" />
+
+        <EditText
             android:id="@+id/qtd_parcelas_edt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -36,12 +56,6 @@
             android:ems="10"
             android:hint="Quantidade de parcelas"
             android:inputType="number" />
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Coloque 0 se ainda não tiver." />
 
         <Button
             android:id="@+id/confirmar_btn"

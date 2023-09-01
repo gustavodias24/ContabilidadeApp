@@ -95,9 +95,21 @@ public class ClientesActivity extends AppCompatActivity {
             int qtd_parcelas = Integer.parseInt(
                     bindingClienteLayout.qtdParcelasEdt.getText().toString()
             );
+
+            Double valorEmprestado = Double.parseDouble(bindingClienteLayout.dinheiroEmprestadoEdt.getText().toString());
+            Double juros = Double.parseDouble(bindingClienteLayout.jurosEdt.getText().toString());
+            Double dinheiroParaPagar = calcularValorComJuros(valorEmprestado, juros);
+
             ClienteModel clienteModel = new ClienteModel();
+
+            clienteModel.setValorParcela(dinheiroParaPagar / qtd_parcelas);
+            clienteModel.setDinheiroEmpretado(valorEmprestado);
+            clienteModel.setDinheeiroParaSerPago(dinheiroParaPagar);
+
+
             clienteModel.setNome(nomeCliente);
             clienteModel.setQtdParcelasFaltante(qtd_parcelas);
+
             lista.add(clienteModel);
             atualizarListaSavlar();
             bindingClienteLayout.nomeClienteEdt.setText("");
@@ -109,6 +121,11 @@ public class ClientesActivity extends AppCompatActivity {
         bindingClienteLayout.confirmarBtn.setText("ADICIONAR");
         b.setView(bindingClienteLayout.getRoot());
         dialog_adicionar = b.create();
+    }
+
+    public  double calcularValorComJuros(double valor, double juros) {
+        double valorDoJuros = valor + ((valor * juros)/100);
+        return valorDoJuros;
     }
     public void atualizarListaSavlar(){
         ClienteStorageUtil.saveUsuario(getApplicationContext(), lista);
@@ -140,6 +157,18 @@ public class ClientesActivity extends AppCompatActivity {
                         b.setNegativeButton("Adicionar Pagamento", (dialogInterface, i) -> {
                             chamarAdicionarPagamento(lista.get(position));
                             dialog_pergunta.dismiss();
+                        });
+
+                        String histotyText =
+                                lista.get(position).getVerPagamento() != null && lista.get(position).getVerPagamento() ? "Esconder pagamentos" : "Ver pagamentos";
+
+                        b.setNeutralButton(histotyText, (dialogInterface, i) -> {
+                            if (lista.get(position).getVerPagamento() && lista.get(position).getVerPagamento() != null){
+                                lista.get(position).setVerPagamento(false);
+                            }else{
+                                lista.get(position).setVerPagamento(true);
+                            }
+                            adapter.notifyDataSetChanged();
                         });
 
                         dialog_pergunta = b.create();
@@ -239,4 +268,6 @@ public class ClientesActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 }

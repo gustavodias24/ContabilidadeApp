@@ -32,6 +32,7 @@
             android:textColor="#000000"
             android:textSize="16sp"
             android:textStyle="bold" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -66,7 +67,20 @@
             android:text="Falta: 5"
             android:textColor="#000000"
             android:textSize="16sp" />
+
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/info_extra_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="Pegou: 0\n Vai pagar: 0\nJá pagou: 0\nFalta: 0\nvalor Parcela: 0"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerParcelas"

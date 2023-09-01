@@ -1,6 +1,8 @@
 package benicio.soluces.contabilidadeapp.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,9 +43,40 @@ public class AdapterCliente extends RecyclerView.Adapter<AdapterCliente.MyViewHo
         return new MyViewHolder(v);
     }
 
+    @SuppressLint("DefaultLocale")
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         ClienteModel clienteModel = lista.get(position);
+
+        double jaPagou = 0;
+
+        if ( clienteModel.getListaPagamentos() != null){
+            for (PagamentoModel pagamento : clienteModel.getListaPagamentos()){
+                jaPagou += pagamento.getValor();
+            }
+        }
+
+        Double faltaPagar = clienteModel.getDinheeiroParaSerPago() - jaPagou;
+        holder.infoExtra.setText(
+                String.format(
+                        "Pegou: R$%.2f"+ "\n"+
+                        "Valor com juros: R$%.2f"+ "\n" +
+                        "Já pagou: R$%.2f"+"\n"+
+                        "Falta: R$%.2f"+"\n"+
+                        "valor Parcela: R$%.2f",
+                        clienteModel.getDinheiroEmpretado(),
+                        clienteModel.getDinheeiroParaSerPago(),
+                        jaPagou,
+                        faltaPagar,
+                        clienteModel.getValorParcela()
+                        )
+
+        );
+        if ( clienteModel.getVerPagamento() != null && clienteModel.getVerPagamento()){
+            holder.recycleParcelas.setVisibility(View.VISIBLE);
+        }else{
+            holder.recycleParcelas.setVisibility(View.GONE);
+        }
 
         holder.nomeCliente.setText(clienteModel.getNome());
 
@@ -86,7 +119,7 @@ public class AdapterCliente extends RecyclerView.Adapter<AdapterCliente.MyViewHo
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         CheckBox pagoCheck;
-        TextView nomeCliente, parcelas, pagas,falta;
+        TextView nomeCliente, parcelas, pagas,falta, infoExtra;
         RecyclerView recycleParcelas;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -96,6 +129,7 @@ public class AdapterCliente extends RecyclerView.Adapter<AdapterCliente.MyViewHo
             falta = itemView.findViewById(R.id.parcelas_falta_text);
             recycleParcelas = itemView.findViewById(R.id.recyclerParcelas);
             pagoCheck = itemView.findViewById(R.id.pago_check);
+            infoExtra = itemView.findViewById(R.id.info_extra_text);
         }
     }
 }
