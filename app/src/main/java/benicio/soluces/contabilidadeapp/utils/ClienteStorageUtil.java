@@ -13,8 +13,8 @@ import java.util.List;
 import benicio.soluces.contabilidadeapp.models.ClienteModel;
 
 public class ClienteStorageUtil {
-    private static final String PREF_NAME = "cliente_prefs";
-    private static final String KEY_TRANSACOES = "clientes";
+    private static final String PREF_NAME = "cliente_preferences_novo";
+    private static final String KEY_TRANSACOES = "clientes_novo";
 
     public static void saveUsuario(Context context, List<ClienteModel> clientes) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);

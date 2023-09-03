@@ -111,9 +111,12 @@ public class ClientesActivity extends AppCompatActivity {
             clienteModel.setQtdParcelasFaltante(qtd_parcelas);
 
             lista.add(clienteModel);
+            binding.recyclerClientes.setVisibility(View.VISIBLE);
             atualizarListaSavlar();
             bindingClienteLayout.nomeClienteEdt.setText("");
             bindingClienteLayout.qtdParcelasEdt.setText("");
+            bindingClienteLayout.jurosEdt.setText("");
+            bindingClienteLayout.dinheiroEmprestadoEdt.setText("");
             dialog_adicionar.dismiss();
             Toast.makeText(this, "Cliente adicionado!", Toast.LENGTH_SHORT).show();
         });
@@ -216,9 +219,11 @@ public class ClientesActivity extends AppCompatActivity {
         String currentDate = sdf.format(calendar.getTime());
 
         pagamentoLayoutBinding.descriEdt.setText("Valor diário");
+        pagamentoLayoutBinding.valorEdt.setText(clienteClicado.getValorParcela() + "");
         pagamentoLayoutBinding.dataEdt.setText(currentDate);
 
         pagamentoLayoutBinding.enviarBtn.setOnClickListener( enviarView -> {
+
             String descri = pagamentoLayoutBinding.descriEdt.getText().toString();
             Double valor = Double.parseDouble(pagamentoLayoutBinding.valorEdt.getText().toString());
             String data = pagamentoLayoutBinding.dataEdt.getText().toString();
