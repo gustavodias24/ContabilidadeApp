@@ -43,7 +43,16 @@ public class ClienteModel implements Serializable {
     }
 
     List<PagamentoModel> listaPagamentos;
-    String nome;
+    String nome, data;
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
     int qtdParcelasFaltante;
 
     public List<PagamentoModel> getListaPagamentos() {

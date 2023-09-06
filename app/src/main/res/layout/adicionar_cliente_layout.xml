@@ -50,12 +50,21 @@
 
         <EditText
             android:id="@+id/qtd_parcelas_edt"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:ems="10"
             android:hint="Quantidade de parcelas"
             android:inputType="number" />
+
+        <EditText
+            android:id="@+id/data_edt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Data do pagamento ( opcional)"
+            android:inputType="date"
+            android:padding="16dp" />
 
         <Button
             android:id="@+id/confirmar_btn"

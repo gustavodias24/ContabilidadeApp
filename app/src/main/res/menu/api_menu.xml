@@ -2,11 +2,8 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/puxarDados"
-        android:title="Puxar Dados"
+        android:id="@+id/contabilidade"
+        android:title="Despesas/receitas"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/enviarDados"
-        android:title="Enviar Dados"
-        app:showAsAction="never" />
+
 </menu>

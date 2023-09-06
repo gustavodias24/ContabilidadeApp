@@ -8,8 +8,10 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -100,6 +102,13 @@ public class ClientesActivity extends AppCompatActivity {
     public void criarDialogAdicionar(){
         AlertDialog.Builder b = new AlertDialog.Builder(ClientesActivity.this);
         AdicionarClienteLayoutBinding bindingClienteLayout = AdicionarClienteLayoutBinding.inflate(getLayoutInflater());
+
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        String currentDate = sdf.format(calendar.getTime());
+
+        bindingClienteLayout.dataEdt.setText(currentDate);
+
         bindingClienteLayout.confirmarBtn.setOnClickListener( btnView -> {
             String nomeCliente = bindingClienteLayout.nomeClienteEdt.getText().toString();
             int qtd_parcelas = Integer.parseInt(
@@ -109,6 +118,7 @@ public class ClientesActivity extends AppCompatActivity {
             Double valorEmprestado = Double.parseDouble(bindingClienteLayout.dinheiroEmprestadoEdt.getText().toString());
             Double juros = Double.parseDouble(bindingClienteLayout.jurosEdt.getText().toString());
             Double dinheiroParaPagar = calcularValorComJuros(valorEmprestado, juros);
+            String dataCliente = bindingClienteLayout.dataEdt.getText().toString();
 
             ClienteModel clienteModel = new ClienteModel();
 
@@ -119,6 +129,7 @@ public class ClientesActivity extends AppCompatActivity {
 
             clienteModel.setNome(nomeCliente);
             clienteModel.setQtdParcelasFaltante(qtd_parcelas);
+            clienteModel.setData(dataCliente);
 
             lista.add(clienteModel);
             binding.recyclerClientes.setVisibility(View.VISIBLE);
@@ -220,6 +231,7 @@ public class ClientesActivity extends AppCompatActivity {
         dialog_editar.show();
     }
 
+    @SuppressLint("DefaultLocale")
     public void chamarAdicionarPagamento(ClienteModel clienteClicado){
         AlertDialog.Builder b = new AlertDialog.Builder(ClientesActivity.this);
         AdicionarPagamentoLayoutBinding pagamentoLayoutBinding = AdicionarPagamentoLayoutBinding.inflate(getLayoutInflater());
@@ -229,13 +241,14 @@ public class ClientesActivity extends AppCompatActivity {
         String currentDate = sdf.format(calendar.getTime());
 
         pagamentoLayoutBinding.descriEdt.setText("Valor diário");
-        pagamentoLayoutBinding.valorEdt.setText(clienteClicado.getValorParcela() + "");
+        pagamentoLayoutBinding.valorEdt.setText(String.format("%.2f", clienteClicado.getValorParcela()));
         pagamentoLayoutBinding.dataEdt.setText(currentDate);
+        pagamentoLayoutBinding.qtdPagamentoEdt.setText("1");
 
         pagamentoLayoutBinding.enviarBtn.setOnClickListener( enviarView -> {
-
+            int qtdPagamento = Integer.parseInt(pagamentoLayoutBinding.qtdPagamentoEdt.getText().toString());
             String descri = pagamentoLayoutBinding.descriEdt.getText().toString();
-            Double valor = Double.parseDouble(pagamentoLayoutBinding.valorEdt.getText().toString());
+            Double valor = Double.parseDouble(pagamentoLayoutBinding.valorEdt.getText().toString().replace(",", "."));
             String data = pagamentoLayoutBinding.dataEdt.getText().toString();
             PagamentoModel pagamento = new PagamentoModel();
             pagamento.setTitulo(descri);
@@ -246,15 +259,19 @@ public class ClientesActivity extends AppCompatActivity {
             } else {
                 pagamento.setData(data);
             }
-
-            if ( clienteClicado.getListaPagamentos() == null){
-                List<PagamentoModel> listaNovaPagamento = new ArrayList<>();
-                listaNovaPagamento.add(pagamento);
-                clienteClicado.setListaPagamentos(listaNovaPagamento);
-            }else{
-                clienteClicado.getListaPagamentos().add(pagamento);
+            if (qtdPagamento > 0){
+                for ( int i = qtdPagamento ; i > 0 ; i--){
+                    if ( clienteClicado.getListaPagamentos() == null){
+                        List<PagamentoModel> listaNovaPagamento = new ArrayList<>();
+                        listaNovaPagamento.add(pagamento);
+                        clienteClicado.setListaPagamentos(listaNovaPagamento);
+                    }else{
+                        clienteClicado.getListaPagamentos().add(pagamento);
+                    }
+                }
             }
 
+            pagamentoLayoutBinding.qtdPagamentoEdt.setText("1");
             pagamentoLayoutBinding.dataEdt.setText("");
             pagamentoLayoutBinding.descriEdt.setText("");
             pagamentoLayoutBinding.valorEdt.setText("");
@@ -286,46 +303,29 @@ public class ClientesActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        if ( item.getItemId() == R.id.enviarDados){
-            if ( ClienteStorageUtil.loadClientes(getApplicationContext()) != null){
-                dialog_carregando.show();
-                service.enviarClientes(ClienteStorageUtil.loadClientes(getApplicationContext())).enqueue(new Callback<String>() {
-                    @Override
-                    public void onResponse(Call<String> call, Response<String> response) {
-                        if (response.isSuccessful()){
-                        }else{
-                            Toast.makeText(ClientesActivity.this, "Erro de conexão!", Toast.LENGTH_SHORT).show();
-                        }
-                        dialog_carregando.dismiss();
-                    }
+//        if ( item.getItemId() == R.id.enviarDados){
+//            if ( ClienteStorageUtil.loadClientes(getApplicationContext()) != null){
+//                dialog_carregando.show();
+//                service.enviarClientes(ClienteStorageUtil.loadClientes(getApplicationContext())).enqueue(new Callback<String>() {
+//                    @Override
+//                    public void onResponse(Call<String> call, Response<String> response) {
+//                        if (response.isSuccessful()){
+//                        }else{
+//                            Toast.makeText(ClientesActivity.this, "Erro de conexão!", Toast.LENGTH_SHORT).show();
+//                        }
+//                        dialog_carregando.dismiss();
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call<String> call, Throwable t) {
+//
+//                    }
+//                });
+//            }
+//        }
 
-                    @Override
-                    public void onFailure(Call<String> call, Throwable t) {
-
-                    }
-                });
-            }
-        }
-
-        if ( item.getItemId() == R.id.puxarDados){
-            dialog_carregando.show();
-            service.puxarClientes().enqueue(new Callback<List<ClienteModel>>() {
-                @Override
-                public void onResponse(Call<List<ClienteModel>> call, Response<List<ClienteModel>> response) {
-                    if (response.isSuccessful()){
-                        ClienteStorageUtil.saveUsuario(getApplicationContext(), response.body());
-                        Toast.makeText(ClientesActivity.this, "clientes recuperados!", Toast.LENGTH_SHORT).show();
-                    }else{
-                        Toast.makeText(ClientesActivity.this, "Erro de conexão!", Toast.LENGTH_SHORT).show();
-                    }
-                    dialog_carregando.dismiss();
-                }
-
-                @Override
-                public void onFailure(Call<List<ClienteModel>> call, Throwable t) {
-
-                }
-            });
+        if ( item.getItemId() == R.id.contabilidade){
+          startActivity(new Intent(getApplicationContext(), MainActivity.class));
         }
 
         return super.onOptionsItemSelected(item);

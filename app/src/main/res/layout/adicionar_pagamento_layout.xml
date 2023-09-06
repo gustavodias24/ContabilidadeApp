@@ -34,13 +34,14 @@
         android:inputType="date"
         android:padding="16dp" />
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/qtd_pagamento_edt"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:text="Se não for colocado a data vai ser cadastrado na data atual." />
+        android:ems="10"
+        android:padding="16dp"
+        android:hint="quantidade de parcelas"
+        android:inputType="numberSigned" />
 
     <Button
         android:id="@+id/enviar_btn"

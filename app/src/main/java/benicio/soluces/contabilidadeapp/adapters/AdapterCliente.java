@@ -2,6 +2,7 @@ package benicio.soluces.contabilidadeapp.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,6 +49,7 @@ public class AdapterCliente extends RecyclerView.Adapter<AdapterCliente.MyViewHo
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         ClienteModel clienteModel = lista.get(position);
 
+        String data_emprestimo = clienteModel.getData() != null && !clienteModel.getData().isEmpty() ? clienteModel.getData() : "";
         double jaPagou = 0;
 
         if ( clienteModel.getListaPagamentos() != null){
@@ -59,6 +61,7 @@ public class AdapterCliente extends RecyclerView.Adapter<AdapterCliente.MyViewHo
         Double faltaPagar = clienteModel.getDinheeiroParaSerPago() - jaPagou;
         holder.infoExtra.setText(
                 String.format(
+                        data_emprestimo + "\n"+
                         "Pegou: R$%.2f"+ "\n"+
                         "Valor com juros: R$%.2f"+ "\n" +
                         "Já pagou: R$%.2f"+"\n"+
@@ -72,6 +75,15 @@ public class AdapterCliente extends RecyclerView.Adapter<AdapterCliente.MyViewHo
                         )
 
         );
+
+        if ( clienteModel.getListaPagamentos().size() >= clienteModel.getQtdParcelasFaltante()){
+            holder.textQuitado.setText("QUITADO");
+            holder.textQuitado.setTextColor(Color.GREEN);
+        }else{
+            holder.textQuitado.setText("NÃO QUITADO");
+            holder.textQuitado.setTextColor(Color.RED);
+        }
+
         if ( clienteModel.getVerPagamento() != null && clienteModel.getVerPagamento()){
             holder.recycleParcelas.setVisibility(View.VISIBLE);
         }else{
@@ -119,7 +131,7 @@ public class AdapterCliente extends RecyclerView.Adapter<AdapterCliente.MyViewHo
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         CheckBox pagoCheck;
-        TextView nomeCliente, parcelas, pagas,falta, infoExtra;
+        TextView nomeCliente, parcelas, pagas,falta, infoExtra, textQuitado;
         RecyclerView recycleParcelas;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -130,6 +142,7 @@ public class AdapterCliente extends RecyclerView.Adapter<AdapterCliente.MyViewHo
             recycleParcelas = itemView.findViewById(R.id.recyclerParcelas);
             pagoCheck = itemView.findViewById(R.id.pago_check);
             infoExtra = itemView.findViewById(R.id.info_extra_text);
+            textQuitado = itemView.findViewById(R.id.is_quitado_text);
         }
     }
 }
