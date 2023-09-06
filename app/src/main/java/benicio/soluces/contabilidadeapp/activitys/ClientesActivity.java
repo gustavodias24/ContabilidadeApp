@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,20 +29,29 @@ import benicio.soluces.contabilidadeapp.adapters.AdapterCliente;
 import benicio.soluces.contabilidadeapp.databinding.ActivityClientesBinding;
 import benicio.soluces.contabilidadeapp.databinding.AdicionarClienteLayoutBinding;
 import benicio.soluces.contabilidadeapp.databinding.AdicionarPagamentoLayoutBinding;
+import benicio.soluces.contabilidadeapp.databinding.CarregandoLayoutBinding;
 import benicio.soluces.contabilidadeapp.models.ClienteModel;
 import benicio.soluces.contabilidadeapp.models.PagamentoModel;
 import benicio.soluces.contabilidadeapp.utils.ClienteStorageUtil;
 import benicio.soluces.contabilidadeapp.utils.RecyclerItemClickListener;
+import benicio.soluces.contabilidadeapp.utils.Service;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ClientesActivity extends AppCompatActivity {
 
     private ActivityClientesBinding binding;
-    private Dialog dialog_adicionar, dialog_editar, dialog_adicionar_pagamento, dialog_pergunta;
+    private Dialog dialog_adicionar, dialog_editar, dialog_adicionar_pagamento, dialog_pergunta, dialog_carregando;
 
     private RecyclerView recyclerView;
     private AdapterCliente adapter;
 
     private List<ClienteModel> lista = new ArrayList<>();
+    private Retrofit retrofit;
+    private Service service;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +61,6 @@ public class ClientesActivity extends AppCompatActivity {
 
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         getSupportActionBar().setTitle("Clientes");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         criarDialogAdicionar();
@@ -67,7 +76,8 @@ public class ClientesActivity extends AppCompatActivity {
             String query = binding.nomePesquisaEdt.getText().toString();
             limitarLista(query);
         });
-
+    criarDialogCarregando();
+    criarRetrofit();
     }
 
     public void limitarLista(String query) {
@@ -266,13 +276,70 @@ public class ClientesActivity extends AppCompatActivity {
             binding.recyclerClientes.setVisibility(View.GONE);
         }
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.api_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if ( item.getItemId() == android.R.id.home){
-            finish();
+
+        if ( item.getItemId() == R.id.enviarDados){
+            if ( ClienteStorageUtil.loadClientes(getApplicationContext()) != null){
+                dialog_carregando.show();
+                service.enviarClientes(ClienteStorageUtil.loadClientes(getApplicationContext())).enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        if (response.isSuccessful()){
+                        }else{
+                            Toast.makeText(ClientesActivity.this, "Erro de conexão!", Toast.LENGTH_SHORT).show();
+                        }
+                        dialog_carregando.dismiss();
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+
+                    }
+                });
+            }
         }
+
+        if ( item.getItemId() == R.id.puxarDados){
+            dialog_carregando.show();
+            service.puxarClientes().enqueue(new Callback<List<ClienteModel>>() {
+                @Override
+                public void onResponse(Call<List<ClienteModel>> call, Response<List<ClienteModel>> response) {
+                    if (response.isSuccessful()){
+                        ClienteStorageUtil.saveUsuario(getApplicationContext(), response.body());
+                        Toast.makeText(ClientesActivity.this, "clientes recuperados!", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(ClientesActivity.this, "Erro de conexão!", Toast.LENGTH_SHORT).show();
+                    }
+                    dialog_carregando.dismiss();
+                }
+
+                @Override
+                public void onFailure(Call<List<ClienteModel>> call, Throwable t) {
+
+                }
+            });
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
-
+    public void criarDialogCarregando(){
+        android.app.AlertDialog.Builder b = new android.app.AlertDialog.Builder(ClientesActivity.this);
+        b.setView(CarregandoLayoutBinding.inflate(getLayoutInflater()).getRoot());
+        b.setCancelable(false);
+        dialog_carregando = b.create();
+    }
+    public void criarRetrofit(){
+        retrofit = new Retrofit.Builder().baseUrl("https://contabilidade-api-teal.vercel.app/")
+                .addConverterFactory(GsonConverterFactory.create()).build();
+        service = retrofit.create(Service.class);
+    }
 }

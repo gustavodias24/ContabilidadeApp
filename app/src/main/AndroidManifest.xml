@@ -17,10 +17,11 @@
         <activity
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
-            android:name=".activitys.ClientesActivity"
+            android:name=".activitys.MainActivity"
             android:exported="false" />
         <activity
-            android:name=".activitys.MainActivity"
+            android:name=".activitys.ClientesActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
