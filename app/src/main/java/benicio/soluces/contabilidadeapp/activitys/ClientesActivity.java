@@ -275,8 +275,7 @@ public class ClientesActivity extends AppCompatActivity {
             );
 
             List<TransacaoModel> listaTransacoes = TransacaoStorageUtil.loadTransacoes(getApplicationContext()) == null ? new ArrayList<>() : TransacaoStorageUtil.loadTransacoes(getApplicationContext());
-            listaTransacoes.add(transacaoModel);
-            TransacaoStorageUtil.saveTransacoes(getApplicationContext(), listaTransacoes);
+
 
             if (data.isEmpty()) {
                 pagamento.setData(currentDate);
@@ -285,7 +284,7 @@ public class ClientesActivity extends AppCompatActivity {
             }
             if (qtdPagamento > 0){
                 for ( int i = qtdPagamento ; i > 0 ; i--){
-
+                    listaTransacoes.add(transacaoModel);
                     if ( clienteClicado.getListaPagamentos() == null){
                         List<PagamentoModel> listaNovaPagamento = new ArrayList<>();
                         listaNovaPagamento.add(pagamento);
@@ -294,6 +293,8 @@ public class ClientesActivity extends AppCompatActivity {
                         clienteClicado.getListaPagamentos().add(pagamento);
                     }
                 }
+                TransacaoStorageUtil.saveTransacoes(getApplicationContext(), listaTransacoes);
+
             }
 
             pagamentoLayoutBinding.qtdPagamentoEdt.setText("1");
