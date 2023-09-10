@@ -314,7 +314,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<ClienteModel>> call, Response<List<ClienteModel>> response) {
                 if (response.isSuccessful()){
-                    ClienteStorageUtil.saveUsuario(getApplicationContext(), response.body());
+                    ClienteStorageUtil.saveClientesNaoQuitado(getApplicationContext(), response.body());
                     Toast.makeText(MainActivity.this, "clientes recuperados!", Toast.LENGTH_SHORT).show();
                 }else{
                     Toast.makeText(MainActivity.this, "Erro de conexão!", Toast.LENGTH_SHORT).show();
@@ -349,9 +349,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if ( ClienteStorageUtil.loadClientes(getApplicationContext()) != null){
+        if ( ClienteStorageUtil.loadClientesNaoQuitado(getApplicationContext()) != null){
             dialog_carregando.show();
-            service.enviarClientes(ClienteStorageUtil.loadClientes(getApplicationContext())).enqueue(new Callback<String>() {
+            service.enviarClientes(ClienteStorageUtil.loadClientesNaoQuitado(getApplicationContext())).enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
                     if (response.isSuccessful()){

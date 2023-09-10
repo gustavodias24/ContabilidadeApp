@@ -1,6 +1,7 @@
 package benicio.soluces.contabilidadeapp.models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ClienteModel implements Serializable {
@@ -42,7 +43,7 @@ public class ClienteModel implements Serializable {
         this.verPagamento = verPagamento;
     }
 
-    List<PagamentoModel> listaPagamentos;
+    List<PagamentoModel> listaPagamentos = new ArrayList<>();
     String nome, data;
 
     public String getData() {

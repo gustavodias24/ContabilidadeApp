@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -44,16 +45,11 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ClientesActivity extends AppCompatActivity {
-
     private ActivityClientesBinding binding;
-    private Dialog dialog_adicionar, dialog_editar, dialog_adicionar_pagamento, dialog_pergunta, dialog_carregando;
-
+    private Dialog dialog_adicionar, dialog_editar, dialog_adicionar_pagamento, dialog_pergunta;
     private RecyclerView recyclerView;
     private AdapterCliente adapter;
-
-    private List<ClienteModel> lista = new ArrayList<>();
-    private Retrofit retrofit;
-    private Service service;
+    private List<ClienteModel> lista;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +61,7 @@ public class ClientesActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Clientes");
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
+        lista = ClienteStorageUtil.loadClientesNaoQuitado(getApplicationContext()) == null ? new ArrayList<>() : ClienteStorageUtil.loadClientesNaoQuitado(getApplicationContext());
         criarDialogAdicionar();
         configurarRecycler();
         configurarAcoesCliente();
@@ -74,30 +71,30 @@ public class ClientesActivity extends AppCompatActivity {
             dialog_adicionar.show();
         });
 
-        binding.pesquisarBtn.setOnClickListener( pesquisar -> {
-            String query = binding.nomePesquisaEdt.getText().toString();
-            limitarLista(query);
-        });
-    criarDialogCarregando();
-    criarRetrofit();
+//        binding.pesquisarBtn.setOnClickListener( pesquisar -> {
+//            String query = binding.nomePesquisaEdt.getText().toString();
+//            limitarLista(query);
+//        });
+    listenerDeExcluirCliente();
+    listenerDeMoveParaQuitados();
     }
 
-    public void limitarLista(String query) {
-        if (query.isEmpty()) {
-            configurarAvisoDeVazio();
-        } else {
-            List<ClienteModel> itemsToRemove = new ArrayList<>();
-
-            for (ClienteModel item : lista) {
-                if (!item.getNome().equals(query)) {
-                    itemsToRemove.add(item);
-                }
-            }
-
-            lista.removeAll(itemsToRemove);
-            adapter.notifyDataSetChanged();
-        }
-    }
+//    public void limitarLista(String query) {
+//        if (query.isEmpty()) {
+//            configurarAvisoDeVazio();
+//        } else {
+//            List<ClienteModel> itemsToRemove = new ArrayList<>();
+//
+//            for (ClienteModel item : lista) {
+//                if (!item.getNome().equals(query)) {
+//                    itemsToRemove.add(item);
+//                }
+//            }
+//
+//            lista.removeAll(itemsToRemove);
+//            adapter.notifyDataSetChanged();
+//        }
+//    }
 
     public void criarDialogAdicionar(){
         AlertDialog.Builder b = new AlertDialog.Builder(ClientesActivity.this);
@@ -134,11 +131,13 @@ public class ClientesActivity extends AppCompatActivity {
             lista.add(clienteModel);
             binding.recyclerClientes.setVisibility(View.VISIBLE);
             atualizarListaSavlar();
+
             bindingClienteLayout.nomeClienteEdt.setText("");
             bindingClienteLayout.qtdParcelasEdt.setText("");
             bindingClienteLayout.jurosEdt.setText("");
             bindingClienteLayout.dinheiroEmprestadoEdt.setText("");
             dialog_adicionar.dismiss();
+
             Toast.makeText(this, "Cliente adicionado!", Toast.LENGTH_SHORT).show();
         });
         bindingClienteLayout.titleText.setText("Adicionar cliente");
@@ -146,13 +145,13 @@ public class ClientesActivity extends AppCompatActivity {
         b.setView(bindingClienteLayout.getRoot());
         dialog_adicionar = b.create();
     }
-
     public  double calcularValorComJuros(double valor, double juros) {
         double valorDoJuros = valor + ((valor * juros)/100);
         return valorDoJuros;
     }
+    @SuppressLint("NotifyDataSetChanged")
     public void atualizarListaSavlar(){
-        ClienteStorageUtil.saveUsuario(getApplicationContext(), lista);
+        ClienteStorageUtil.saveClientesNaoQuitado(getApplicationContext(), lista);
         configurarAvisoDeVazio();
         adapter.notifyDataSetChanged();
     }
@@ -230,7 +229,6 @@ public class ClientesActivity extends AppCompatActivity {
         dialog_editar = b.create();
         dialog_editar.show();
     }
-
     @SuppressLint("DefaultLocale")
     public void chamarAdicionarPagamento(ClienteModel clienteClicado){
         AlertDialog.Builder b = new AlertDialog.Builder(ClientesActivity.this);
@@ -285,21 +283,24 @@ public class ClientesActivity extends AppCompatActivity {
     }
     public void configurarAvisoDeVazio(){
         lista.clear();
-        if (ClienteStorageUtil.loadClientes(getApplicationContext()) != null){
-            lista.addAll(ClienteStorageUtil.loadClientes(getApplicationContext()));
+        if (ClienteStorageUtil.loadClientesNaoQuitado(getApplicationContext()) != null){
+            lista.addAll(ClienteStorageUtil.loadClientesNaoQuitado(getApplicationContext()));
             binding.avisoClienteText.setVisibility(View.GONE);
             adapter.notifyDataSetChanged();
         }else{
             binding.recyclerClientes.setVisibility(View.GONE);
         }
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.api_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        configurarAvisoDeVazio();
+    }
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
@@ -326,20 +327,65 @@ public class ClientesActivity extends AppCompatActivity {
 
         if ( item.getItemId() == R.id.contabilidade){
           startActivity(new Intent(getApplicationContext(), MainActivity.class));
+        }else if ( item.getItemId() == R.id.quitados){
+            startActivity(new Intent(getApplicationContext(), QuitadosActivity.class));
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    public void criarDialogCarregando(){
-        android.app.AlertDialog.Builder b = new android.app.AlertDialog.Builder(ClientesActivity.this);
-        b.setView(CarregandoLayoutBinding.inflate(getLayoutInflater()).getRoot());
-        b.setCancelable(false);
-        dialog_carregando = b.create();
+    public void listenerDeExcluirCliente(){
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                AlertDialog.Builder b = new AlertDialog.Builder(ClientesActivity.this);
+                b.setMessage("Deletar esse registro?");
+                b.setPositiveButton("Sim", (dialogInterface, i) -> {
+                    lista.remove(viewHolder.getAdapterPosition());
+                    ClienteStorageUtil.saveClientesNaoQuitado(getApplicationContext(), lista);
+                    adapter.notifyDataSetChanged();
+                });
+                b.setCancelable(false);
+                b.setNegativeButton("Não", (d, i) -> adapter.notifyDataSetChanged());
+                b.create().show();
+            }
+        }).attachToRecyclerView(recyclerView);
     }
-    public void criarRetrofit(){
-        retrofit = new Retrofit.Builder().baseUrl("https://contabilidade-api-teal.vercel.app/")
-                .addConverterFactory(GsonConverterFactory.create()).build();
-        service = retrofit.create(Service.class);
+
+    public void listenerDeMoveParaQuitados(){
+        new ItemTouchHelper(
+                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+                    @Override
+                    public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                        AlertDialog.Builder b = new AlertDialog.Builder(ClientesActivity.this);
+                        b.setMessage("Mover para quitados?");
+                        b.setPositiveButton("Sim", (dialogInterface, i) -> {
+
+                            List<ClienteModel> listaQuitados = ClienteStorageUtil.loadClientesQuitado(getApplicationContext()) == null ? new ArrayList<>() : ClienteStorageUtil.loadClientesQuitado(getApplicationContext());
+                            listaQuitados.add(lista.get(viewHolder.getAdapterPosition()));
+                            ClienteStorageUtil.saveClientesQuitado(getApplicationContext(), listaQuitados);
+                            Toast.makeText(ClientesActivity.this, "Movido para quitados.", Toast.LENGTH_SHORT).show();
+
+                            lista.remove(viewHolder.getAdapterPosition());
+                            ClienteStorageUtil.saveClientesNaoQuitado(getApplicationContext(), lista);
+                            adapter.notifyDataSetChanged();
+                        });
+                        b.setCancelable(false);
+                        b.setNegativeButton("Não", (d, i) -> adapter.notifyDataSetChanged());
+                        b.create().show();
+                    }
+                }
+        ).attachToRecyclerView(recyclerView);
     }
 }

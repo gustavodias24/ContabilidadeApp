@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -44,7 +46,7 @@ public class AdapterCliente extends RecyclerView.Adapter<AdapterCliente.MyViewHo
         return new MyViewHolder(v);
     }
 
-    @SuppressLint("DefaultLocale")
+    @SuppressLint({"DefaultLocale", "SetTextI18n"})
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         ClienteModel clienteModel = lista.get(position);
@@ -76,13 +78,8 @@ public class AdapterCliente extends RecyclerView.Adapter<AdapterCliente.MyViewHo
 
         );
 
-        if ( clienteModel.getListaPagamentos().size() >= clienteModel.getQtdParcelasFaltante()){
-            holder.textQuitado.setText("QUITADO");
-            holder.textQuitado.setTextColor(Color.GREEN);
-        }else{
-            holder.textQuitado.setText("NÃO QUITADO");
-            holder.textQuitado.setTextColor(Color.RED);
-        }
+
+
 
         if ( clienteModel.getVerPagamento() != null && clienteModel.getVerPagamento()){
             holder.recycleParcelas.setVisibility(View.VISIBLE);
@@ -91,7 +88,6 @@ public class AdapterCliente extends RecyclerView.Adapter<AdapterCliente.MyViewHo
         }
 
         holder.nomeCliente.setText(clienteModel.getNome());
-
         holder.parcelas.setText("Parcelas: " + clienteModel.getQtdParcelasFaltante());
 
         if ( clienteModel.getListaPagamentos() != null ){
@@ -99,7 +95,7 @@ public class AdapterCliente extends RecyclerView.Adapter<AdapterCliente.MyViewHo
             holder.falta.setText("Falta: " + (clienteModel.getQtdParcelasFaltante() - clienteModel.getListaPagamentos().size()));
         }else{
             holder.pagas.setText("Pagas: 0");
-            holder.falta.setText("Falta: 0");
+            holder.falta.setText("Falta: " + clienteModel.getQtdParcelasFaltante());
         }
 
         if ( clienteModel.getListaPagamentos() != null){
@@ -108,7 +104,7 @@ public class AdapterCliente extends RecyclerView.Adapter<AdapterCliente.MyViewHo
             holder.recycleParcelas.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
             adapter = new AdapterPagamento(clienteModel.getListaPagamentos(), context);
             holder.recycleParcelas.setAdapter(adapter);
-            ClienteStorageUtil.saveUsuario(context, lista);
+            ClienteStorageUtil.saveClientesNaoQuitado(context, lista);
             adapter.notifyDataSetChanged();
 
             Calendar calendar = Calendar.getInstance();
@@ -120,6 +116,24 @@ public class AdapterCliente extends RecyclerView.Adapter<AdapterCliente.MyViewHo
                 if ( pagamento.getData().equals(formattedDate) ){
                     holder.pagoCheck.setChecked(true);
                 }
+            }
+
+            if ( clienteModel.getListaPagamentos().size() >= clienteModel.getQtdParcelasFaltante()){
+                holder.textQuitado.setText("QUITADO");
+                holder.textQuitado.setTextColor(Color.GREEN);
+
+//                List<ClienteModel> clienteAtigoQuitado = ClienteStorageUtil.loadClientesQuitado(context) == null ? new ArrayList<>() : ClienteStorageUtil.loadClientesQuitado(context);
+//
+//                clienteAtigoQuitado.add(clienteModel);
+//                lista.remove(position);
+//
+//                ClienteStorageUtil.saveClientesQuitado(context, clienteAtigoQuitado);
+//                ClienteStorageUtil.saveClientesNaoQuitado(context, lista);
+//
+//                Toast.makeText(context, "Cliente movido para quitados.", Toast.LENGTH_SHORT).show();
+            }else{
+                holder.textQuitado.setText("NÃO QUITADO");
+                holder.textQuitado.setTextColor(Color.RED);
             }
         }
     }

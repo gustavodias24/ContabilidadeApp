@@ -6,4 +6,10 @@
         android:title="Despesas/receitas"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/quitados"
+        android:title="quitados"
+        app:showAsAction="never" />
+
+
 </menu>
