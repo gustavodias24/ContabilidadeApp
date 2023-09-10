@@ -35,9 +35,11 @@ import benicio.soluces.contabilidadeapp.databinding.AdicionarPagamentoLayoutBind
 import benicio.soluces.contabilidadeapp.databinding.CarregandoLayoutBinding;
 import benicio.soluces.contabilidadeapp.models.ClienteModel;
 import benicio.soluces.contabilidadeapp.models.PagamentoModel;
+import benicio.soluces.contabilidadeapp.models.TransacaoModel;
 import benicio.soluces.contabilidadeapp.utils.ClienteStorageUtil;
 import benicio.soluces.contabilidadeapp.utils.RecyclerItemClickListener;
 import benicio.soluces.contabilidadeapp.utils.Service;
+import benicio.soluces.contabilidadeapp.utils.TransacaoStorageUtil;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -118,6 +120,18 @@ public class ClientesActivity extends AppCompatActivity {
             String dataCliente = bindingClienteLayout.dataEdt.getText().toString();
 
             ClienteModel clienteModel = new ClienteModel();
+
+            TransacaoModel transacaoModel = new TransacaoModel(
+                    2,
+                    String.format("Empréstimo de %s", nomeCliente),
+                    dataCliente,
+                    valorEmprestado
+                    );
+
+            transacaoModel.setValorJuros(dinheiroParaPagar);
+            List<TransacaoModel> listaTransacoes = TransacaoStorageUtil.loadTransacoes(getApplicationContext()) == null ? new ArrayList<>() : TransacaoStorageUtil.loadTransacoes(getApplicationContext());
+            listaTransacoes.add(transacaoModel);
+            TransacaoStorageUtil.saveTransacoes(getApplicationContext(), listaTransacoes);
 
             clienteModel.setValorParcela(dinheiroParaPagar / qtd_parcelas);
             clienteModel.setDinheiroEmpretado(valorEmprestado);
@@ -244,6 +258,7 @@ public class ClientesActivity extends AppCompatActivity {
         pagamentoLayoutBinding.qtdPagamentoEdt.setText("1");
 
         pagamentoLayoutBinding.enviarBtn.setOnClickListener( enviarView -> {
+
             int qtdPagamento = Integer.parseInt(pagamentoLayoutBinding.qtdPagamentoEdt.getText().toString());
             String descri = pagamentoLayoutBinding.descriEdt.getText().toString();
             Double valor = Double.parseDouble(pagamentoLayoutBinding.valorEdt.getText().toString().replace(",", "."));
@@ -252,6 +267,17 @@ public class ClientesActivity extends AppCompatActivity {
             pagamento.setTitulo(descri);
             pagamento.setValor(valor);
 
+            TransacaoModel transacaoModel = new TransacaoModel(
+                    1,
+                    "Pagamento de parcela de " + clienteClicado.getNome(),
+                    data,
+                    valor
+            );
+
+            List<TransacaoModel> listaTransacoes = TransacaoStorageUtil.loadTransacoes(getApplicationContext()) == null ? new ArrayList<>() : TransacaoStorageUtil.loadTransacoes(getApplicationContext());
+            listaTransacoes.add(transacaoModel);
+            TransacaoStorageUtil.saveTransacoes(getApplicationContext(), listaTransacoes);
+
             if (data.isEmpty()) {
                 pagamento.setData(currentDate);
             } else {
@@ -259,6 +285,7 @@ public class ClientesActivity extends AppCompatActivity {
             }
             if (qtdPagamento > 0){
                 for ( int i = qtdPagamento ; i > 0 ; i--){
+
                     if ( clienteClicado.getListaPagamentos() == null){
                         List<PagamentoModel> listaNovaPagamento = new ArrayList<>();
                         listaNovaPagamento.add(pagamento);
